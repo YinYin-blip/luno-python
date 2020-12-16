@@ -189,6 +189,8 @@ def get_balances(self, assets=None, account_id=None):
 
         :param assets: Only return balances for wallets with these currencies (if not provided,
                        all balances will be returned)
+        :param account_id: Only return balance for wallet that matches account_id (if not provided,
+                       all balances will be returned)
         :type assets: list
         """
         req = {
