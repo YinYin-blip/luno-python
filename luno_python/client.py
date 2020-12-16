@@ -323,12 +323,10 @@ class Client(BaseClient):
         }
         return self.do('GET', '/api/1/quotes/{id}', req=req, auth=True)
 
-    def get_ticker(self, pair):
-        """Makes a call to GET /api/1/ticker.
+    def get_ticker(self, pair='XBTZAR'):
+        """Makes a call to GET /api/1/orderbook_top.
 
-        Returns the latest ticker indicators for the specified currency pair.
-
-        Please see the <a href="#tag/currency ">Currency list</a> for the complete list of supported currency pairs.
+        Returns the latest ticker indicators.
 
         :param pair: Currency pair
         :type pair: str
@@ -336,7 +334,26 @@ class Client(BaseClient):
         req = {
             'pair': pair,
         }
-        return self.do('GET', '/api/1/ticker', req=req, auth=False)
+        start = time.time()
+        response = self.do('GET', '/api/1/orderbook_top', req=req, auth=False)
+        end = time.time()
+
+        estimated_server_time = int(((start+end)/2)*1000)
+        if response is None:
+            ticker = {
+                "name": "luno",
+                "timestamp": estimated_server_time,
+                "error": True
+            }
+        else:
+            ticker = {
+                "name": "luno",
+                "timestamp": response['timestamp'],
+                "bid": response['bids'][0],
+                "ask": response['asks'][0],
+                "error": False
+            }
+        return ticker
 
     def get_tickers(self):
         """Makes a call to GET /api/1/tickers.
