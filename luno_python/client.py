@@ -180,10 +180,10 @@ class Client(BaseClient):
         }
         return self.do('PUT', '/api/1/quotes/{id}', req=req, auth=True)
 
-    def get_balances(self, assets=None):
+def get_balances(self, assets=None, account_id=None):
         """Makes a call to GET /api/1/balance.
 
-        The list of all Accounts and their respective balances for the requesting user.
+        Return the list of all accounts and their respective balances.
 
         Permissions required: <code>Perm_R_Balance</code>
 
@@ -194,7 +194,14 @@ class Client(BaseClient):
         req = {
             'assets': assets,
         }
-        return self.do('GET', '/api/1/balance', req=req, auth=True)
+        if account_id:
+            response = self.do('GET', '/api/1/balance', req=req, auth=True)
+            for balance in response['balance']:
+                if balance['account_id'] == account_id:
+                    return balance
+            raise KeyError("%s does not exist" % (account_id))
+        else:
+            return self.do('GET', '/api/1/balance', req=req, auth=True)
 
     def get_fee_info(self, pair):
         """Makes a call to GET /api/1/fee_info.
